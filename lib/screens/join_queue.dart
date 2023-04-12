@@ -1,7 +1,9 @@
+import 'package:booking/utils/queues.dart';
 import 'package:booking/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 enum Service { oilchange, tires, service, paint }
 
@@ -36,8 +38,7 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final databaseReference = database.ref().child("/users_services");
-
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -272,37 +273,12 @@ class _JoinQueueScreenState extends State<JoinQueueScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          // databaseReference.set({
-                          //   "userId": FirebaseAuth.instance.currentUser!.uid,
-                          // "services": services,
-                          // "travel_time": [selectedHrs, selectedMins],
-                          // "service_time": [selectedHrs, selectedMins],
-                          // "total_Service_time": [selectedHrs, selectedMins]
-                          // });
-                          databaseReference.set(
-                            {
-                              FirebaseAuth.instance.currentUser!.uid: {
-                                "services": services,
-                                "travel_time": {
-                                  "hrs": selectedHrs,
-                                  "mins":selectedMins,
-                                },
-                                "service_time": {
-                                  "hrs": selectedHrs,
-                                  "mins":selectedMins,
-                                },
-                                "total_Service_time":{
-                                  "hrs": selectedHrs,
-                                  "mins":selectedMins,
-                                },
-                                "dateCreated": DateTime.now().toIso8601String(),
-                              },
-                            },
-                          );
+                          Provider.of<Queues>(context, listen: false)
+                              .joinQueue(selectedHrs, selectedMins, services);
                           setState(() {
                             _showSnackBar();
+                            Navigator.of(context).pop();
                           });
-                          Navigator.of(context).pop();
                         },
                         child: const Text('Yes'),
                       ),
